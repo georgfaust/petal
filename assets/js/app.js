@@ -2,6 +2,7 @@
 // The MiniCssExtractPlugin is used to separate it out into
 // its own CSS file.
 import "../css/app.css"
+import Alpine from "alpinejs";
 
 // webpack automatically bundles all modules in your
 // entry points. Those entry points can be configured
@@ -18,7 +19,17 @@ import NProgress from "nprogress"
 import { LiveSocket } from "phoenix_live_view"
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-let liveSocket = new LiveSocket("/live", Socket, { params: { _csrf_token: csrfToken } })
+let liveSocket = new LiveSocket("/live", Socket, {
+	params: { _csrf_token: csrfToken },
+	dom: {
+		onBeforeElUpdated(from, to) {
+			if (from.__x) {
+				Alpine.clone(from.__x, to);
+			}
+		},
+	},
+}
+)
 
 // Show progress bar on live navigation and form submits
 window.addEventListener("phx:page-loading-start", info => NProgress.start())
